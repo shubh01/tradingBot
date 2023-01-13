@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuctionRunner.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tradingbot</a> &gt; <a href="index.source.html" class="el_package">com.tradingbot.auction.impl</a> &gt; <span class="el_source">AuctionRunner.java</span></div><h1>AuctionRunner.java</h1><pre class="source lang-java linenums">package com.tradingbot.auction.impl;
+
+import com.tradingbot.auction.Auction;
+import com.tradingbot.bidder.Bidder;
+import com.tradingbot.data.BidResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.stream.IntStream;
+
+/**
+ * Class implements Auction interface and define beginAuction method
+ */
+public class AuctionRunner implements Auction {
+
+    private Bidder firstBidder;
+    private Bidder secondBidder;
+    private int cash;
+    private int productQuantity;
+<span class="fc" id="L21">    private Logger logger = LoggerFactory.getLogger(AuctionRunner.class);</span>
+<span class="fc" id="L22">    private HashMap&lt;BidResult, Integer&gt; winnerMap = new HashMap&lt;&gt;();</span>
+
+<span class="fc" id="L24">    public AuctionRunner(Bidder firstBidder, Bidder secondBidder, int cash, int productQuantity) {</span>
+<span class="fc" id="L25">        this.firstBidder = firstBidder;</span>
+<span class="fc" id="L26">        this.secondBidder = secondBidder;</span>
+<span class="fc" id="L27">        this.cash = cash;</span>
+<span class="fc" id="L28">        this.productQuantity = productQuantity;</span>
+<span class="fc" id="L29">    }</span>
+
+    /**
+     *Method begin auction for both the parties
+     * @return
+     */
+    @Override
+    public BidResult beginAuction() {
+<span class="fc" id="L37">        firstBidder.init(productQuantity,cash);</span>
+<span class="fc" id="L38">        secondBidder.init(productQuantity,cash);</span>
+<span class="fc" id="L39">        System.out.println(&quot;--------------Auction for &quot;+productQuantity+&quot; products will begin now.---------------&quot;);</span>
+
+<span class="fc" id="L41">        IntStream.range(0, productQuantity / 2).forEach(product -&gt;{</span>
+<span class="fc" id="L42">            int userBid = secondBidder.placeBid();</span>
+<span class="fc" id="L43">            int systemBid = firstBidder.placeBid();</span>
+<span class="fc" id="L44">            System.out.println(&quot;System Bid: &quot;+systemBid+&quot; User Bid: &quot;+userBid);</span>
+<span class="fc" id="L45">            logger.debug(&quot;System Bid: &quot;+systemBid+&quot; User Bid: &quot;+userBid);</span>
+<span class="fc" id="L46">            firstBidder.bids(systemBid,userBid);</span>
+<span class="fc" id="L47">            int comparison = Integer.compare(systemBid,userBid);</span>
+<span class="pc bpc" id="L48" title="2 of 4 branches missed.">            winnerMap = comparison == 0 ? putBidInWinnerMap(BidResult.DRAW) : comparison ==1 ? putBidInWinnerMap(BidResult.SYSTEM_WIN) : putBidInWinnerMap(BidResult.USER_WIN);</span>
+
+<span class="fc" id="L50">        });</span>
+<span class="fc" id="L51">        logger.debug(&quot;Auction for &quot;+productQuantity+&quot; products has finished. Going to display the winner.&quot;);</span>
+<span class="fc" id="L52">        return displayWinner();</span>
+    }
+
+    /**
+     * Method display winner of the auction
+     */
+    private BidResult displayWinner() {
+<span class="fc bfc" id="L59" title="All 4 branches covered.">        if(winnerMap.get(BidResult.USER_WIN) != null &amp;&amp; winnerMap.get(BidResult.USER_WIN).equals(winnerMap.get(BidResult.SYSTEM_WIN))){</span>
+<span class="fc" id="L60">            logger.debug(&quot;Auction Result : Draw&quot;);</span>
+<span class="fc" id="L61">            return BidResult.DRAW;</span>
+        }else{
+<span class="pc bpc" id="L63" title="1 of 4 branches missed.">            BidResult bidResult = winnerMap.entrySet().stream().max((entry1, entry2) -&gt; entry1.getValue() &gt; entry2.getValue() ? 1: entry1.getValue() &lt; entry2.getValue() ? -1 : 0).get().getKey();</span>
+<span class="fc" id="L64">            logger.debug(&quot;Auction Result : &quot;+bidResult.getBidResult());</span>
+<span class="fc" id="L65">            return  bidResult;</span>
+        }
+
+    }
+
+    /**
+     * Method puts bid winner in map and increments the winner count
+     * @param bidResult
+     */
+    private HashMap&lt;BidResult,Integer&gt; putBidInWinnerMap(BidResult bidResult){
+<span class="fc" id="L75">        logger.debug(&quot;bidResult: &quot;+bidResult.getBidResult());</span>
+<span class="fc" id="L76">        Integer value = winnerMap.get(bidResult);</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">        if(winnerMap.get(bidResult) == null){</span>
+<span class="fc bfc" id="L78" title="All 2 branches covered.">            if(bidResult.equals(BidResult.DRAW))</span>
+<span class="fc" id="L79">                winnerMap.put(bidResult,1);</span>
+<span class="fc" id="L80">            else winnerMap.put(bidResult,2);</span>
+        }else{
+<span class="fc bfc" id="L82" title="All 2 branches covered.">            if(bidResult.equals(BidResult.DRAW))</span>
+<span class="fc" id="L83">                winnerMap.put(bidResult,value+1);</span>
+<span class="fc" id="L84">            else winnerMap.put(bidResult,value+2);</span>
+        }
+<span class="fc" id="L86">        return winnerMap;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

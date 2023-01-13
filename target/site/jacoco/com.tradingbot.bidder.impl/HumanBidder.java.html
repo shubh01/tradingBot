@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>HumanBidder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tradingbot</a> &gt; <a href="index.source.html" class="el_package">com.tradingbot.bidder.impl</a> &gt; <span class="el_source">HumanBidder.java</span></div><h1>HumanBidder.java</h1><pre class="source lang-java linenums">package com.tradingbot.bidder.impl;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Scanner;
+
+/**
+ * Class for Human Bidder
+ */
+public class HumanBidder  extends AbstractCommonBidder {
+
+    private final Scanner scanner;
+
+<span class="fc" id="L15">    private Logger logger = LoggerFactory.getLogger(HumanBidder.class);</span>
+
+<span class="fc" id="L17">    public HumanBidder(Scanner scanner){</span>
+<span class="fc" id="L18">        this.scanner = scanner;</span>
+<span class="fc" id="L19">    }</span>
+
+    /**
+     * method contains logic to place bids for user
+     * @return
+     */
+    @Override
+    public int placeBid() {
+<span class="fc" id="L27">        logger.debug(&quot;@method placeBid&quot;);</span>
+
+<span class="fc" id="L29">        System.out.println(&quot;Place Bid - Positive and less than Cash&quot;);</span>
+<span class="fc" id="L30">        int bid = scanner.nextInt();</span>
+
+<span class="pc bpc" id="L32" title="2 of 4 branches missed.">        while (bid &lt;0 || bid&gt;myCash){</span>
+<span class="nc" id="L33">            System.out.println(&quot;------ Invalid Bid-------&quot;);</span>
+<span class="nc" id="L34">            System.out.println(&quot;Bid should be &gt;=0 and &lt;&quot;+myCash);</span>
+<span class="nc" id="L35">            bid = scanner.nextInt();</span>
+        }
+
+<span class="fc" id="L38">        return bid;</span>
+    }
+
+    /**
+     * method contains the logic to deduct cash
+     * @param own
+     * the bid of this bidder
+     * @param other
+     */
+    @Override
+    public void bids(int own, int other) {
+<span class="fc" id="L49">        logger.debug(&quot;@method bids&quot;);</span>
+<span class="fc" id="L50">        this.myCash -= own;</span>
+<span class="fc" id="L51">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

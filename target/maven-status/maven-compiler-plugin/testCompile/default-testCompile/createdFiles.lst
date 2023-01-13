@@ -1,0 +1,6 @@
+com\tradingbot\auction\impl\AuctionRunnerTest.class
+com\tradingbot\bidder\impl\BotBidderTest.class
+com\tradingbot\bidder\impl\HumanBidderTest.class
+com\tradingbot\data\BidderTypeTest.class
+com\tradingbot\data\BidResultTest.class
+com\tradingbot\bidder\BidderFactoryTest.class

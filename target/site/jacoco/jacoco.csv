@@ -1,0 +1,8 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+tradingbot,com.tradingbot.bidder.impl,HumanBidder,19,40,2,2,3,12,2,3,0,3
+tradingbot,com.tradingbot.bidder.impl,AbstractCommonBidder,0,62,0,6,0,11,0,7,0,4
+tradingbot,com.tradingbot.bidder.impl,BotBidder,6,360,4,16,0,45,4,10,0,4
+tradingbot,com.tradingbot.bidder,BidderFactory,0,35,0,2,0,6,0,3,0,2
+tradingbot,com.tradingbot.data,BidderType,0,46,0,0,0,7,0,5,0,5
+tradingbot,com.tradingbot.data,BidResult,0,57,0,0,0,8,0,5,0,5
+tradingbot,com.tradingbot.auction.impl,AuctionRunner,8,276,3,15,0,38,3,12,0,6

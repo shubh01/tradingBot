@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BotBidder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tradingbot</a> &gt; <a href="index.source.html" class="el_package">com.tradingbot.bidder.impl</a> &gt; <span class="el_source">BotBidder.java</span></div><h1>BotBidder.java</h1><pre class="source lang-java linenums">package com.tradingbot.bidder.impl;
+
+import com.tradingbot.data.BidResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Random;
+
+/**
+ * Class for automated bidder
+ */
+public class BotBidder extends AbstractCommonBidder {
+
+<span class="fc" id="L15">    private Logger logger = LoggerFactory.getLogger(BotBidder.class);</span>
+
+<span class="fc" id="L17">    private ArrayList&lt;Integer&gt; bidHistory = new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L19">    public BotBidder() {</span>
+<span class="fc" id="L20">    }</span>
+
+    /**
+     * method contains logic to place bids for system
+     * @return
+     */
+    @Override
+    public int placeBid() {
+
+<span class="fc bfc" id="L29" title="All 2 branches covered.">        if(this.myCash == 0){</span>
+<span class="fc" id="L30">            logger.debug(&quot;myCash is 0 returning 0&quot;);</span>
+<span class="fc" id="L31">            return 0;</span>
+        }
+<span class="fc bfc" id="L33" title="All 2 branches covered.">        if(opponentCash == 0){</span>
+<span class="fc" id="L34">            logger.debug(&quot;opponentCash is 0 returning 1&quot;);</span>
+<span class="fc" id="L35">            return 1;</span>
+        }
+<span class="fc bfc" id="L37" title="All 2 branches covered.">        if(totalQuantity == 2) {</span>
+<span class="fc" id="L38">            logger.debug(&quot;totalQuantity is 2 returning all cash&quot;);</span>
+<span class="fc" id="L39">            return myCash;</span>
+        }
+<span class="fc bfc" id="L41" title="All 2 branches covered.">        if(bidHistory.size() == 0){</span>
+<span class="fc" id="L42">            logger.debug(&quot;bid history is empty&quot;);</span>
+<span class="pc bpc" id="L43" title="1 of 2 branches missed.">            int randomBid = new Random().nextBoolean() ? 1 : 2;</span>
+<span class="pc bpc" id="L44" title="1 of 2 branches missed.">            return randomBid &lt;= this.myCash ? randomBid : this.myCash;</span>
+        }
+<span class="fc" id="L46">        double median = findMedian(bidHistory.stream().mapToInt(value -&gt; value).toArray());</span>
+<span class="fc" id="L47">        int nextValue = (int) (Math.round(median)) + 1;</span>
+<span class="pc bpc" id="L48" title="1 of 2 branches missed.">        return nextValue &lt;= this.myCash ? nextValue : this.myCash;</span>
+    }
+
+    /**
+     * method contains the logic to compare the bids of two bidders and allot the quantity accordingly
+     * @param own
+     * the bid of this bidder
+     * @param other
+     */
+    @Override
+    public void bids(int own, int other) {
+<span class="fc" id="L59">        logger.debug(&quot;bids own:&quot;+own+&quot; other: &quot;+other);</span>
+<span class="fc" id="L60">        BidResult bidResult = compareBids(own,other);</span>
+<span class="fc bfc" id="L61" title="All 2 branches covered.">        if(bidResult.equals(BidResult.SYSTEM_WIN)){</span>
+<span class="fc" id="L62">            this.myPurchasedQuantity += 2;</span>
+<span class="fc" id="L63">            this.myCash -= own;</span>
+<span class="fc" id="L64">            this.opponentCash -= other;</span>
+<span class="fc" id="L65">            bidHistory.add(own);</span>
+<span class="fc" id="L66">            System.out.println(&quot;Available Cash - System: &quot;+myCash+&quot; User: &quot;+opponentCash+&quot; Product Quantity - System: &quot;+myPurchasedQuantity+&quot; User: &quot;+opponentPurchasedQuantity);</span>
+<span class="fc" id="L67">            logger.debug(&quot;Available Cash - System: &quot;+myCash+&quot; User: &quot;+opponentCash+&quot; Product Quantity - System: &quot;+myPurchasedQuantity+&quot; User: &quot;+opponentPurchasedQuantity);</span>
+<span class="fc bfc" id="L68" title="All 2 branches covered.">        }else if(bidResult.equals(BidResult.DRAW)){</span>
+<span class="fc" id="L69">            this.myPurchasedQuantity += 1;</span>
+<span class="fc" id="L70">            this.myCash -= own;</span>
+<span class="fc" id="L71">            this.opponentCash -= other;</span>
+<span class="fc" id="L72">            bidHistory.add(own);</span>
+<span class="fc" id="L73">            this.opponentPurchasedQuantity +=1;</span>
+<span class="fc" id="L74">            System.out.println(&quot;Available Cash - System: &quot;+myCash+&quot; User: &quot;+opponentCash+&quot; Product Quantity - System: &quot;+myPurchasedQuantity+&quot; User: &quot;+opponentPurchasedQuantity);</span>
+<span class="fc" id="L75">            logger.debug(&quot;Available Cash - System: &quot;+myCash+&quot; User: &quot;+opponentCash+&quot; Product Quantity - System: &quot;+myPurchasedQuantity+&quot; User: &quot;+opponentPurchasedQuantity);</span>
+<span class="pc bpc" id="L76" title="1 of 2 branches missed.">        }else if(bidResult.equals(BidResult.USER_WIN)){</span>
+<span class="fc" id="L77">            this.opponentPurchasedQuantity += 2;</span>
+<span class="fc" id="L78">            this.opponentCash -= other;</span>
+<span class="fc" id="L79">            this.myCash -= own;</span>
+<span class="fc" id="L80">            System.out.println(&quot;Available Cash - System: &quot;+myCash+&quot; User: &quot;+opponentCash+&quot; Product Quantity - System: &quot;+myPurchasedQuantity+&quot; User: &quot;+opponentPurchasedQuantity);</span>
+<span class="fc" id="L81">            logger.debug(&quot;Available Cash - System: &quot;+myCash+&quot; User: &quot;+opponentCash+&quot; Product Quantity - System: &quot;+myPurchasedQuantity+&quot; User: &quot;+opponentPurchasedQuantity);</span>
+<span class="fc" id="L82">            bidHistory.add(other);</span>
+        }
+<span class="fc" id="L84">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

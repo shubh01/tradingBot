@@ -1,0 +1,10 @@
+com\tradingbot\data\BidResult.class
+com\tradingbot\AuctionMain.class
+com\tradingbot\bidder\BidderFactory.class
+com\tradingbot\bidder\impl\AbstractCommonBidder.class
+com\tradingbot\data\BidderType.class
+com\tradingbot\auction\Auction.class
+com\tradingbot\bidder\impl\HumanBidder.class
+com\tradingbot\bidder\Bidder.class
+com\tradingbot\bidder\impl\BotBidder.class
+com\tradingbot\auction\impl\AuctionRunner.class
